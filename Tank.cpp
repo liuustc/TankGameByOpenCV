@@ -3,13 +3,17 @@
 cv::Mat Tank::Draw()
 {
 	cv::Mat drawed_canvus = canvus.clone();
-	cv::Point pt1(x - tank_size.width / 2, y + tank_size.height / 2);
-	cv::Point pt2(x + tank_size.width / 2, y - tank_size.height / 2);
-	cv::rectangle(drawed_canvus, pt1, pt2, CV_RGB(255, 255, 255), CV_FILLED);
+	this->DrawTank(drawed_canvus);
+	this->DrawBullets(drawed_canvus);
+	return drawed_canvus;
+}
+
+void Tank::DrawBullets(cv::Mat& drawed_canvus)
+{
 	for (auto& it : bullets)
 	{
-		if(it.IsInSight())
-			drawed_canvus = it.Draw(drawed_canvus);
+		if (it.IsInSight())
+			it.Draw(drawed_canvus);
 	}
 
 	for (auto it = bullets.begin(); it != bullets.end();)
@@ -19,9 +23,21 @@ cv::Mat Tank::Draw()
 		else
 			it = bullets.erase(it);
 	}
-
-	return drawed_canvus;
 }
+
+void Tank::DrawTank(cv::Mat& drawed_canvus)
+{
+	const int cannon_length = 30;
+	cv::Point pt1(x - tank_size.width / 2, y + tank_size.height / 2);
+	cv::Point pt2(x + tank_size.width / 2, y - (tank_size.height / 2 - cannon_length));
+	cv::rectangle(drawed_canvus, pt1, pt2, CV_RGB(255, 255, 255), CV_FILLED);
+
+	const int cannon_width = 10;
+	cv::Point pt3(x - cannon_width / 2, cvRound(y - tank_size.height / 2));
+	cv::Point pt4(x + cannon_width / 2, cvRound(y + tank_size.height / 2));
+	cv::rectangle(drawed_canvus, pt3, pt4, CV_RGB(255, 255, 255), CV_FILLED);
+}
+
 
 void Tank::MoveRight()
 {
@@ -55,36 +71,33 @@ void Tank::Move(const char key)
 {
 	if (key == 'w')
 	{
-		(*this).MoveUp();
+		this->MoveUp();
 	}
 	else if (key == 's')
 	{
-		(*this).MoveDown();
+		this->MoveDown();
 	}
 	else if (key == 'a')
 	{
-		(*this).MoveLeft();
+		this->MoveLeft();
 	}
 	else if (key == 'd')
 	{
-		(*this).MoveRight();
+		this->MoveRight();
 	}
 	else if (key == 'j')
 	{
 		bullets.push_back(Bullet(cv::Point(x, y - tank_size.height / 2), 3, 5));
 	}
 }
-
-cv::Mat Bullet::Draw(cv::Mat canvus)
+void Bullet::Draw(cv::Mat& canvus)
 {
 	loop += 1;
 	position.y -= speed;
 	if (position.y < 0 || !is_in_sight)
 	{
-		is_in_sight = false;
-		return canvus; // 子弹已经跑出视野
+		is_in_sight = false;// 子弹已经跑出视野
 	}
 
 	cv::circle(canvus, position, size, CV_RGB(255, 255, 255), CV_FILLED);
-	return canvus;
 }

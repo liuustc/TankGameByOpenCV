@@ -7,7 +7,7 @@
 class Bullet
 {
 public:
-	Bullet(const cv::Point& pos, double size_, int speed_)
+	Bullet(const cv::Point& pos, int size_, int speed_)
 	{
 		position = pos;
 		size = size_;
@@ -16,14 +16,14 @@ public:
 		is_in_sight = true;
 	}
 
-	cv::Mat Draw(cv::Mat canvus);
+	void Draw(cv::Mat& canvus);
 	bool IsInSight() { return is_in_sight; }
 
 private:
 	cv::Point		position;
-	double			size;
-	int				speed;
+	int				size;
 	unsigned long   loop;
+	int				speed;
 	bool			is_in_sight;
 };
 
@@ -48,6 +48,8 @@ private:
 	void MoveUp();
 	void MoveRight();
 	void MoveDown();
+	void DrawTank(cv::Mat&);
+	void DrawBullets(cv::Mat&);
 };
 
 #endif // !_TANK_H_
